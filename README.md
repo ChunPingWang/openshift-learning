@@ -51,39 +51,162 @@
 | 監控告警 | 需安裝 Prometheus Stack | 內建完整監控堆疊 |
 | 認證管理 | 基本認證 | 整合 OAuth、LDAP、AD |
 
-### OpenShift 核心元件
+### OpenShift 架構總覽
 
+```mermaid
+graph TB
+    subgraph "使用者介面"
+        A[👤 開發者/管理員]
+        B[🌐 Web Console]
+        C[💻 CLI - oc]
+        D[🔌 API]
+    end
+
+    subgraph "Control Plane"
+        E[API Server]
+        F[(etcd)]
+        G[Controller Manager]
+        H[Scheduler]
+        I[OAuth Server]
+    end
+
+    subgraph "Worker Node"
+        J[kubelet]
+        K[CRI-O]
+        L[OVN-Kubernetes]
+
+        subgraph "Pods"
+            M[📦 Container 1]
+            N[📦 Container 2]
+            O[📦 Container 3]
+        end
+    end
+
+    subgraph "OpenShift 擴充功能"
+        P[Route / Ingress]
+        Q[S2I Builder]
+        R[Prometheus / Alertmanager]
+        S[EFK Logging]
+    end
+
+    A --> B
+    A --> C
+    A --> D
+    B --> E
+    C --> E
+    D --> E
+    E <--> F
+    E --> G
+    E --> H
+    E --> I
+    G --> J
+    H --> J
+    J --> K
+    K --> M
+    K --> N
+    K --> O
+    L --> M
+    L --> N
+    L --> O
+    P --> M
+    Q --> K
+    R --> E
+    S --> M
+
+    style E fill:#EE0000,color:#fff
+    style F fill:#326CE5,color:#fff
+    style G fill:#326CE5,color:#fff
+    style H fill:#326CE5,color:#fff
+    style K fill:#EE0000,color:#fff
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     OpenShift 架構                          │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   Web 控制台  │  │   CLI (oc)   │  │    API      │        │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
-│         └────────────────┼────────────────┘                │
-│                          ▼                                  │
-│  ┌─────────────────────────────────────────────────────┐  │
-│  │                 OpenShift API Server                 │  │
-│  └─────────────────────────────────────────────────────┘  │
-│                          │                                  │
-│    ┌─────────────────────┼─────────────────────┐          │
-│    ▼                     ▼                     ▼          │
-│  ┌───────┐  ┌─────────────────┐  ┌─────────────────┐     │
-│  │ etcd  │  │   Controller    │  │    Scheduler    │     │
-│  │       │  │    Manager      │  │                 │     │
-│  └───────┘  └─────────────────┘  └─────────────────┘     │
-│                                                            │
-│  ┌─────────────────────────────────────────────────────┐  │
-│  │                   Worker Nodes                       │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐            │  │
-│  │  │ kubelet │  │  CRI-O  │  │ OVN-K8s │            │  │
-│  │  └─────────┘  └─────────┘  └─────────┘            │  │
-│  │                                                     │  │
-│  │  ┌─────────────────────────────────────────────┐  │  │
-│  │  │              Pods / Containers               │  │  │
-│  │  └─────────────────────────────────────────────┘  │  │
-│  └─────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+
+### OpenShift 網路流量架構
+
+```mermaid
+flowchart LR
+    subgraph "外部"
+        Internet[🌐 Internet]
+    end
+
+    subgraph "OpenShift Cluster"
+        subgraph "Ingress Layer"
+            Router[HAProxy Router]
+            Route[Route]
+        end
+
+        subgraph "Service Layer"
+            SVC[Service<br/>ClusterIP]
+            EP[Endpoints]
+        end
+
+        subgraph "Pod Layer"
+            Pod1[Pod 1]
+            Pod2[Pod 2]
+            Pod3[Pod 3]
+        end
+    end
+
+    Internet -->|HTTPS| Router
+    Router -->|Route 規則| Route
+    Route -->|負載均衡| SVC
+    SVC --> EP
+    EP --> Pod1
+    EP --> Pod2
+    EP --> Pod3
+
+    style Router fill:#EE0000,color:#fff
+    style SVC fill:#326CE5,color:#fff
+```
+
+### Kubernetes 資源階層
+
+```mermaid
+graph TD
+    subgraph "Cluster 層級"
+        A[Cluster]
+        B[Node]
+        C[Namespace]
+        D[PersistentVolume]
+        E[ClusterRole]
+    end
+
+    subgraph "Namespace 層級"
+        F[Deployment]
+        G[Service]
+        H[ConfigMap]
+        I[Secret]
+        J[PVC]
+        K[Role]
+        L[ServiceAccount]
+    end
+
+    subgraph "Pod 層級"
+        M[Pod]
+        N[Container]
+        O[Volume]
+    end
+
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    C --> F
+    C --> G
+    C --> H
+    C --> I
+    C --> J
+    C --> K
+    C --> L
+    F --> M
+    M --> N
+    M --> O
+    J --> D
+    K --> L
+
+    style A fill:#326CE5,color:#fff
+    style C fill:#EE0000,color:#fff
+    style F fill:#326CE5,color:#fff
+    style M fill:#326CE5,color:#fff
 ```
 
 ---
@@ -91,6 +214,46 @@
 ## 什麼是 CRC？
 
 [CodeReady Containers (CRC)](https://developers.redhat.com/products/codeready-containers/overview) 是 Red Hat 提供的本機 OpenShift 開發環境，讓開發者可以在筆電或桌機上執行完整的 OpenShift 叢集。
+
+### CRC 架構
+
+```mermaid
+graph TB
+    subgraph "Host Machine"
+        A[🖥️ 開發者電腦]
+
+        subgraph "Hypervisor"
+            B[KVM / HyperKit / Hyper-V]
+
+            subgraph "CRC VM"
+                C[RHEL CoreOS]
+                D[OpenShift 4.x]
+
+                subgraph "Single Node Cluster"
+                    E[Control Plane]
+                    F[Worker]
+                    G[📦 User Workloads]
+                end
+            end
+        end
+    end
+
+    H[💻 oc CLI]
+    I[🌐 Web Console]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    F --> G
+    H --> D
+    I --> D
+
+    style D fill:#EE0000,color:#fff
+    style E fill:#326CE5,color:#fff
+    style F fill:#326CE5,color:#fff
+```
 
 ### CRC 特點
 
@@ -198,9 +361,82 @@ oc expose svc/my-nginx
 oc get route my-nginx
 ```
 
+### 應用部署流程
+
+```mermaid
+sequenceDiagram
+    participant Dev as 👤 開發者
+    participant CLI as 💻 oc CLI
+    participant API as API Server
+    participant Ctrl as Controller
+    participant Node as Worker Node
+    participant Pod as Pod
+
+    Dev->>CLI: oc new-app nginx
+    CLI->>API: 建立 Deployment
+    API->>Ctrl: 偵測新資源
+    Ctrl->>API: 建立 ReplicaSet
+    Ctrl->>API: 建立 Pod 規格
+    API->>Node: 排程 Pod
+    Node->>Pod: 啟動容器
+    Pod-->>API: 回報狀態
+    API-->>CLI: 部署成功
+    CLI-->>Dev: 顯示結果
+```
+
 ---
 
 ## 課程內容
+
+### 課程結構總覽
+
+```mermaid
+graph LR
+    subgraph "初階 Beginner"
+        L1[Level 1<br/>基礎操作]
+        L2[Level 2<br/>應用部署]
+    end
+
+    subgraph "中階 Intermediate"
+        L3[Level 3<br/>配置管理]
+        L4[Level 4<br/>網路服務]
+        L5[Level 5<br/>儲存管理]
+    end
+
+    subgraph "進階 Advanced"
+        L6[Level 6<br/>安全性]
+        L7[Level 7<br/>監控日誌]
+    end
+
+    subgraph "專家 Expert"
+        L8[Level 8<br/>CI/CD]
+        L9[Level 9<br/>Operator]
+        L10[Level 10<br/>綜合情境]
+    end
+
+    L1 --> L2
+    L2 --> L3
+    L3 --> L4
+    L4 --> L5
+    L5 --> L6
+    L6 --> L7
+    L7 --> L8
+    L8 --> L9
+    L9 --> L10
+
+    style L1 fill:#4CAF50,color:#fff
+    style L2 fill:#4CAF50,color:#fff
+    style L3 fill:#2196F3,color:#fff
+    style L4 fill:#2196F3,color:#fff
+    style L5 fill:#2196F3,color:#fff
+    style L6 fill:#FF9800,color:#fff
+    style L7 fill:#FF9800,color:#fff
+    style L8 fill:#EE0000,color:#fff
+    style L9 fill:#EE0000,color:#fff
+    style L10 fill:#EE0000,color:#fff
+```
+
+---
 
 ### Level 1：基礎操作（Beginner）
 
@@ -233,6 +469,22 @@ oc get route my-nginx
 
 📖 **指南**：[level2-intermediate-guide.md](level2-intermediate-guide.md)
 
+#### Deployment 更新流程
+
+```mermaid
+graph LR
+    subgraph "Rolling Update"
+        A[Deployment v1] -->|更新映像| B[建立新 ReplicaSet]
+        B --> C[啟動新 Pod]
+        C --> D[健康檢查通過]
+        D --> E[終止舊 Pod]
+        E --> F[Deployment v2]
+    end
+
+    style A fill:#FF9800,color:#fff
+    style F fill:#4CAF50,color:#fff
+```
+
 ---
 
 ### Level 3：配置管理（Intermediate）
@@ -247,6 +499,39 @@ oc get route my-nginx
 | 3.4 | ConfigMap 熱更新 | 配置自動更新機制 |
 
 📖 **指南**：[level3-configmap-secret-guide.md](level3-configmap-secret-guide.md)
+
+#### 配置注入方式
+
+```mermaid
+graph TD
+    subgraph "配置來源"
+        CM[ConfigMap]
+        SEC[Secret]
+        DA[Downward API]
+    end
+
+    subgraph "注入方式"
+        ENV[環境變數]
+        VOL[Volume 掛載]
+    end
+
+    subgraph "Pod"
+        APP[應用程式]
+    end
+
+    CM -->|envFrom| ENV
+    CM -->|volumeMounts| VOL
+    SEC -->|secretKeyRef| ENV
+    SEC -->|volumeMounts| VOL
+    DA -->|fieldRef| ENV
+    DA -->|volumeMounts| VOL
+    ENV --> APP
+    VOL --> APP
+
+    style CM fill:#2196F3,color:#fff
+    style SEC fill:#EE0000,color:#fff
+    style APP fill:#4CAF50,color:#fff
+```
 
 ---
 
@@ -264,6 +549,41 @@ oc get route my-nginx
 
 📖 **指南**：[level4-network-services-guide.md](level4-network-services-guide.md)
 
+#### Service 類型比較
+
+```mermaid
+graph TB
+    subgraph "ClusterIP"
+        A1[Pod] --> S1[Service<br/>10.217.x.x]
+        A2[Pod] --> S1
+    end
+
+    subgraph "NodePort"
+        B1[Pod] --> S2[Service]
+        S2 --> NP[NodePort<br/>30000-32767]
+        EXT1[外部流量] --> NP
+    end
+
+    subgraph "LoadBalancer"
+        C1[Pod] --> S3[Service]
+        S3 --> LB[雲端 LB]
+        EXT2[外部流量] --> LB
+    end
+
+    subgraph "Headless"
+        D1[Pod-0<br/>10.x.x.1]
+        D2[Pod-1<br/>10.x.x.2]
+        DNS[DNS 直接<br/>回傳 Pod IP]
+        DNS --> D1
+        DNS --> D2
+    end
+
+    style S1 fill:#326CE5,color:#fff
+    style S2 fill:#326CE5,color:#fff
+    style S3 fill:#326CE5,color:#fff
+    style LB fill:#FF9800,color:#fff
+```
+
 ---
 
 ### Level 5：儲存管理（Intermediate）
@@ -278,6 +598,45 @@ oc get route my-nginx
 | 5.4 | 儲存快照 | VolumeSnapshot 操作 |
 
 📖 **指南**：[level5-storage-guide.md](level5-storage-guide.md)
+
+#### 儲存架構
+
+```mermaid
+graph TB
+    subgraph "Storage Class"
+        SC[StorageClass<br/>crc-csi-hostpath]
+    end
+
+    subgraph "Persistent Volume"
+        PV1[PV 1<br/>10Gi]
+        PV2[PV 2<br/>20Gi]
+        PV3[PV 3<br/>50Gi]
+    end
+
+    subgraph "Persistent Volume Claim"
+        PVC1[PVC<br/>app-data]
+        PVC2[PVC<br/>db-data]
+    end
+
+    subgraph "Pod"
+        P1[App Pod]
+        P2[DB Pod]
+    end
+
+    SC -->|動態配置| PV1
+    SC -->|動態配置| PV2
+    SC -->|動態配置| PV3
+    PVC1 -->|Bound| PV1
+    PVC2 -->|Bound| PV2
+    P1 -->|volumeMounts| PVC1
+    P2 -->|volumeMounts| PVC2
+
+    style SC fill:#FF9800,color:#fff
+    style PV1 fill:#4CAF50,color:#fff
+    style PV2 fill:#4CAF50,color:#fff
+    style PVC1 fill:#2196F3,color:#fff
+    style PVC2 fill:#2196F3,color:#fff
+```
 
 ---
 
@@ -295,6 +654,91 @@ oc get route my-nginx
 
 📖 **指南**：[level6-security-guide.md](level6-security-guide.md)
 
+#### RBAC 模型
+
+```mermaid
+graph LR
+    subgraph "身份"
+        U[User]
+        G[Group]
+        SA[ServiceAccount]
+    end
+
+    subgraph "綁定"
+        RB[RoleBinding]
+        CRB[ClusterRoleBinding]
+    end
+
+    subgraph "權限"
+        R[Role<br/>Namespace 範圍]
+        CR[ClusterRole<br/>Cluster 範圍]
+    end
+
+    subgraph "資源"
+        POD[Pods]
+        DEP[Deployments]
+        SEC[Secrets]
+        NS[Namespaces]
+    end
+
+    U --> RB
+    G --> RB
+    SA --> RB
+    U --> CRB
+    G --> CRB
+    SA --> CRB
+    RB --> R
+    CRB --> CR
+    R --> POD
+    R --> DEP
+    R --> SEC
+    CR --> NS
+    CR --> POD
+
+    style R fill:#2196F3,color:#fff
+    style CR fill:#EE0000,color:#fff
+    style SA fill:#4CAF50,color:#fff
+```
+
+#### 零信任網路模型
+
+```mermaid
+graph TB
+    subgraph "External"
+        INT[🌐 Internet]
+    end
+
+    subgraph "Ingress Layer"
+        ING[Ingress Controller]
+    end
+
+    subgraph "Application Tier"
+        subgraph "Frontend"
+            FE[Frontend Pods]
+        end
+        subgraph "Backend"
+            BE[Backend Pods]
+        end
+        subgraph "Database"
+            DB[Database Pods]
+        end
+    end
+
+    INT -->|允許| ING
+    ING -->|允許| FE
+    FE -->|允許 :8080| BE
+    BE -->|允許 :5432| DB
+
+    INT -.->|拒絕| BE
+    INT -.->|拒絕| DB
+    FE -.->|拒絕| DB
+
+    style ING fill:#EE0000,color:#fff
+    style FE fill:#4CAF50,color:#fff
+    style BE fill:#2196F3,color:#fff
+    style DB fill:#FF9800,color:#fff
+```
+
 ---
 
 ### Level 7-10：進階主題（Advanced/Expert）
@@ -310,44 +754,106 @@ oc get route my-nginx
 
 📖 **指南**：[level7-10-advanced-guide.md](level7-10-advanced-guide.md)
 
+#### CI/CD Pipeline 流程
+
+```mermaid
+graph LR
+    subgraph "Source"
+        GIT[Git Repository]
+    end
+
+    subgraph "Build"
+        CLONE[Clone]
+        TEST[Unit Test]
+        BUILD[Build Image]
+    end
+
+    subgraph "Deploy"
+        DEV[Dev 環境]
+        STG[Staging 環境]
+        PROD[Production 環境]
+    end
+
+    GIT -->|Webhook| CLONE
+    CLONE --> TEST
+    TEST --> BUILD
+    BUILD --> DEV
+    DEV -->|自動| STG
+    STG -->|手動審核| PROD
+
+    style GIT fill:#333,color:#fff
+    style BUILD fill:#2196F3,color:#fff
+    style PROD fill:#4CAF50,color:#fff
+```
+
+#### 微服務架構範例
+
+```mermaid
+graph TB
+    subgraph "External"
+        USER[👤 使用者]
+    end
+
+    subgraph "Edge Layer"
+        GW[API Gateway]
+    end
+
+    subgraph "Service Layer"
+        US[User Service]
+        PS[Product Service]
+        OS[Order Service]
+        NS[Notification Service]
+    end
+
+    subgraph "Data Layer"
+        PG[(PostgreSQL)]
+        RD[(Redis Cache)]
+        MQ[RabbitMQ]
+    end
+
+    USER --> GW
+    GW --> US
+    GW --> PS
+    GW --> OS
+    US --> PG
+    PS --> PG
+    PS --> RD
+    OS --> PG
+    OS --> MQ
+    MQ --> NS
+
+    style GW fill:#EE0000,color:#fff
+    style US fill:#2196F3,color:#fff
+    style PS fill:#2196F3,color:#fff
+    style OS fill:#2196F3,color:#fff
+    style PG fill:#336791,color:#fff
+    style RD fill:#DC382D,color:#fff
+```
+
 ---
 
 ## 學習路線圖
 
-```
-                    🎯 OpenShift 學習路線圖
-
-    ┌─────────────────────────────────────────────────────┐
-    │                                                     │
-    │   Week 1-2: 基礎篇                                  │
-    │   ├── Level 1: 基礎操作                             │
-    │   └── Level 2: 應用部署                             │
-    │                                                     │
-    ├─────────────────────────────────────────────────────┤
-    │                                                     │
-    │   Week 3-4: 中階篇                                  │
-    │   ├── Level 3: 配置管理                             │
-    │   ├── Level 4: 網路與服務                           │
-    │   └── Level 5: 儲存管理                             │
-    │                                                     │
-    ├─────────────────────────────────────────────────────┤
-    │                                                     │
-    │   Week 5-6: 進階篇                                  │
-    │   ├── Level 6: 安全性                               │
-    │   └── Level 7: 監控與日誌                           │
-    │                                                     │
-    ├─────────────────────────────────────────────────────┤
-    │                                                     │
-    │   Week 7-8: 專家篇                                  │
-    │   ├── Level 8: CI/CD Pipeline                      │
-    │   ├── Level 9: Operator 開發                        │
-    │   └── Level 10: 綜合情境                            │
-    │                                                     │
-    ├─────────────────────────────────────────────────────┤
-    │                                                     │
-    │   🏆 認證準備: EX280 模擬考題                        │
-    │                                                     │
-    └─────────────────────────────────────────────────────┘
+```mermaid
+gantt
+    title OpenShift 學習路線圖
+    dateFormat  YYYY-MM-DD
+    section 基礎篇
+    Level 1 基礎操作     :a1, 2024-01-01, 7d
+    Level 2 應用部署     :a2, after a1, 7d
+    section 中階篇
+    Level 3 配置管理     :b1, after a2, 5d
+    Level 4 網路服務     :b2, after b1, 5d
+    Level 5 儲存管理     :b3, after b2, 4d
+    section 進階篇
+    Level 6 安全性       :c1, after b3, 5d
+    Level 7 監控日誌     :c2, after c1, 5d
+    section 專家篇
+    Level 8 CI/CD        :d1, after c2, 7d
+    Level 9 Operator     :d2, after d1, 7d
+    Level 10 綜合情境    :d3, after d2, 7d
+    section 認證
+    EX280 模擬考         :e1, after d3, 7d
 ```
 
 ### 建議學習時間
