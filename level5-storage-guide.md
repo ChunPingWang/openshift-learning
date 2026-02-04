@@ -1,8 +1,8 @@
 # OpenShift/Kubernetes Level 5 儲存管理實作指南
 
-> 基於 CRC (CodeReady Containers) 環境的實戰練習結果
+> 基於 OpenShift Local（原 CodeReady Containers）環境的實戰練習結果
 
-> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 OpenShift Local 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
 
 ---
 
@@ -321,7 +321,7 @@ spec:
       storage: 1Gi
 ```
 
-**注意：** CRC 環境可能不支援 VolumeSnapshot，需要額外配置 CSI 驅動。
+**注意：** OpenShift Local 環境可能不支援 VolumeSnapshot，需要額外配置 CSI 驅動。
 
 ---
 
@@ -394,4 +394,4 @@ oc exec <pod> -- ls -la /data
 ---
 
 *文件產生時間：2026-02-04*
-*測試環境：CRC 2.57.0 / OpenShift 4.x*
+*測試環境：OpenShift Local 2.57.0 / OpenShift 4.x*

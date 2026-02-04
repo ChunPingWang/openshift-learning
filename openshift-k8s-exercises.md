@@ -1,8 +1,8 @@
 # OpenShift / Kubernetes 實戰練習題集
 
-> 使用 CRC 環境進行實作練習
+> 使用 OpenShift Local 環境進行實作練習
 
-> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 OpenShift Local 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
 
 ---
 
@@ -26,10 +26,10 @@
 
 ## 練習環境準備
 
-### 啟動 CRC 環境
+### 啟動 OpenShift Local 環境
 
 ```bash
-# 啟動 CRC
+# 啟動 OpenShift Local
 crc start
 
 # 設定環境變數

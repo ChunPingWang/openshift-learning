@@ -2,9 +2,9 @@
 
 [![OpenShift](https://img.shields.io/badge/OpenShift-4.x-EE0000?logo=redhatopenshift)](https://www.openshift.com/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-1.28+-326CE5?logo=kubernetes)](https://kubernetes.io/)
-[![CRC](https://img.shields.io/badge/CRC-2.57.0-EE0000)](https://developers.redhat.com/products/codeready-containers/overview)
+[![OpenShift Local](https://img.shields.io/badge/OpenShift_Local-2.57.0-EE0000)](https://developers.redhat.com/products/openshift-local/overview)
 
-> 使用 CRC (CodeReady Containers) 環境進行 OpenShift/Kubernetes 實作練習的完整學習資源
+> 使用 OpenShift Local（原 CodeReady Containers）環境進行 OpenShift/Kubernetes 實作練習的完整學習資源
 
 ---
 
@@ -12,7 +12,7 @@
 
 - [專案簡介](#專案簡介)
 - [什麼是 OpenShift？](#什麼是-openshift)
-- [什麼是 CRC？](#什麼是-crc)
+- [什麼是 OpenShift Local？](#什麼是-openshift-local)
 - [環境需求](#環境需求)
 - [快速開始](#快速開始)
 - [課程內容](#課程內容)
@@ -23,14 +23,14 @@
 
 ## 專案簡介
 
-本專案提供一套完整的 OpenShift/Kubernetes 實戰練習教材，從基礎操作到進階應用，涵蓋 10 個學習等級、50+ 個練習題目。所有練習都可以在本機的 CRC 環境中完成，無需雲端資源。
+本專案提供一套完整的 OpenShift/Kubernetes 實戰練習教材，從基礎操作到進階應用，涵蓋 10 個學習等級、50+ 個練習題目。所有練習都可以在本機的 OpenShift Local 環境中完成，無需雲端資源。
 
 ### 特色
 
 - 📚 **循序漸進**：從 Level 1 到 Level 10，難度逐步提升
 - 🔧 **動手實作**：每個練習都有完整的指令和預期結果
 - 🇹🇼 **繁體中文**：全中文說明，適合台灣學習者
-- 💻 **本機環境**：使用 CRC，無需雲端費用
+- 💻 **本機環境**：使用 OpenShift Local，無需雲端費用
 - 📋 **EX280 準備**：包含模擬考題，適合認證準備
 
 ---
@@ -211,11 +211,11 @@ graph TD
 
 ---
 
-## 什麼是 CRC？
+## 什麼是 OpenShift Local？
 
-[CodeReady Containers (CRC)](https://developers.redhat.com/products/codeready-containers/overview) 是 Red Hat 提供的本機 OpenShift 開發環境，讓開發者可以在筆電或桌機上執行完整的 OpenShift 叢集。
+[Red Hat OpenShift Local](https://developers.redhat.com/products/openshift-local/overview)（原 CodeReady Containers，CLI 指令仍為 `crc`）是 Red Hat 提供的本機 OpenShift 開發環境，讓開發者可以在筆電或桌機上執行完整的 OpenShift 叢集。
 
-### CRC 架構
+### OpenShift Local 架構
 
 ```mermaid
 graph TB
@@ -225,7 +225,7 @@ graph TB
         subgraph "Hypervisor"
             B[KVM / HyperKit / Hyper-V]
 
-            subgraph "CRC VM"
+            subgraph "OpenShift Local VM"
                 C[RHEL CoreOS]
                 D[OpenShift 4.x]
 
@@ -255,7 +255,7 @@ graph TB
     style F fill:#326CE5,color:#fff
 ```
 
-### CRC 特點
+### OpenShift Local 特點
 
 | 特點 | 說明 |
 |------|------|
@@ -265,11 +265,11 @@ graph TB
 | 🆓 免費使用 | 開發者授權免費 |
 | 🔄 最新版本 | 定期更新至最新 OpenShift 版本 |
 
-### CRC vs 其他選項
+### OpenShift Local vs 其他選項
 
 | 方案 | 適用場景 | 成本 | 複雜度 |
 |------|----------|------|--------|
-| **CRC** | 本機開發/學習 | 免費 | 低 |
+| **OpenShift Local** | 本機開發/學習 | 免費 | 低 |
 | Minikube | K8s 學習 | 免費 | 低 |
 | Kind | CI/CD 測試 | 免費 | 中 |
 | OpenShift Dedicated | 生產環境 | 付費 | 中 |
@@ -295,17 +295,17 @@ graph TB
   - macOS: HyperKit
   - Windows: Hyper-V
 
-### 安裝 CRC
+### 安裝 OpenShift Local
 
 ```bash
-# 1. 下載 CRC
+# 1. 下載 OpenShift Local
 # 從 https://console.redhat.com/openshift/create/local 下載
 
 # 2. 解壓縮並安裝
 tar xvf crc-linux-amd64.tar.xz
 sudo mv crc-linux-*-amd64/crc /usr/local/bin/
 
-# 3. 設定 CRC
+# 3. 設定 OpenShift Local
 crc setup
 
 # 4. 啟動叢集
@@ -322,10 +322,10 @@ oc login -u developer https://api.crc.testing:6443
 
 ## 快速開始
 
-### 1. 啟動 CRC 環境
+### 1. 啟動 OpenShift Local 環境
 
 ```bash
-# 啟動 CRC
+# 啟動 OpenShift Local
 crc start
 
 # 設定 oc 命令
@@ -337,7 +337,7 @@ crc console --credentials
 
 ### 2. 登入叢集
 
-> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 OpenShift Local 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
 
 ```bash
 # 以開發者身份登入
@@ -871,7 +871,7 @@ gantt
 
 ## 常見問題
 
-### Q: CRC 啟動失敗怎麼辦？
+### Q: OpenShift Local 啟動失敗怎麼辦？
 
 ```bash
 # 檢查虛擬化支援
@@ -883,10 +883,10 @@ crc setup
 crc start
 ```
 
-### Q: 如何增加 CRC 資源？
+### Q: 如何增加 OpenShift Local 資源？
 
 ```bash
-# 停止 CRC
+# 停止 OpenShift Local
 crc stop
 
 # 調整配置
@@ -920,7 +920,7 @@ crc console
 - [OpenShift 官方文件](https://docs.openshift.com/)
 - [Kubernetes 官方文件](https://kubernetes.io/docs/)
 - [Red Hat 開發者網站](https://developers.redhat.com/)
-- [CRC 下載頁面](https://console.redhat.com/openshift/create/local)
+- [OpenShift Local 下載頁面](https://console.redhat.com/openshift/create/local)
 
 ---
 

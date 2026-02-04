@@ -1,8 +1,8 @@
 # OpenShift/Kubernetes Level 4 網路與服務實作指南
 
-> 基於 CRC (CodeReady Containers) 環境的實戰練習結果
+> 基於 OpenShift Local（原 CodeReady Containers）環境的實戰練習結果
 
-> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 OpenShift Local 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
 
 ---
 
@@ -436,4 +436,4 @@ oc exec <pod> -- nslookup <service>.<namespace>.svc.cluster.local
 ---
 
 *文件產生時間：2026-02-04*
-*測試環境：CRC 2.57.0 / OpenShift 4.x*
+*測試環境：OpenShift Local 2.57.0 / OpenShift 4.x*

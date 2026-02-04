@@ -1,8 +1,8 @@
 # OpenShift/Kubernetes Level 2 應用部署實作指南
 
-> 基於 CRC (CodeReady Containers) 環境的實戰練習結果
+> 基於 OpenShift Local（原 CodeReady Containers）環境的實戰練習結果
 
-> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 OpenShift Local 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
 
 ---
 
@@ -502,7 +502,7 @@ oc expose service/django-app
 oc start-build django-app
 ```
 
-**注意：** 在 CRC 環境中，由於資源限制，S2I 建置可能會因為 Pod 被驅逐而失敗。在生產環境中通常不會有此問題。
+**注意：** 在 OpenShift Local 環境中，由於資源限制，S2I 建置可能會因為 Pod 被驅逐而失敗。在生產環境中通常不會有此問題。
 
 ---
 
@@ -548,4 +548,4 @@ oc start-build django-app
 ---
 
 *文件產生時間：2026-02-04*
-*測試環境：CRC 2.57.0 / OpenShift 4.x*
+*測試環境：OpenShift Local 2.57.0 / OpenShift 4.x*

@@ -1,6 +1,6 @@
 # OpenShift/Kubernetes Level 1 初學者實作指南
 
-> 基於 CRC (CodeReady Containers) 環境的實戰練習結果
+> 基於 OpenShift Local（原 CodeReady Containers）環境的實戰練習結果
 
 ---
 
@@ -14,7 +14,7 @@
 | 管理員密碼 | *依安裝結果而定* |
 | 一般使用者 | developer / developer |
 
-> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用以下指令取得您環境的實際密碼：
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 OpenShift Local 安裝時都會自動產生，每個環境的密碼都不同。請使用以下指令取得您環境的實際密碼：
 > ```bash
 > crc console --credentials
 > ```
@@ -689,4 +689,4 @@ oc delete project dev-team-a
 ---
 
 *文件產生時間：2026-02-04*
-*測試環境：CRC 2.57.0 / OpenShift 4.x*
+*測試環境：OpenShift Local 2.57.0 / OpenShift 4.x*
