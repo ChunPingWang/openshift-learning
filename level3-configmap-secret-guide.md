@@ -2,6 +2,8 @@
 
 > 基於 CRC (CodeReady Containers) 環境的實戰練習結果
 
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+
 ---
 
 ## Exercise 3.1：ConfigMap 操作

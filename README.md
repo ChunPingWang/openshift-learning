@@ -337,11 +337,13 @@ crc console --credentials
 
 ### 2. 登入叢集
 
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用 `crc console --credentials` 指令取得您環境的實際密碼。
+
 ```bash
 # 以開發者身份登入
 oc login -u developer -p developer https://api.crc.testing:6443
 
-# 或以管理員身份登入
+# 或以管理員身份登入（請替換 <password> 為您的實際密碼）
 oc login -u kubeadmin -p <password> https://api.crc.testing:6443
 ```
 

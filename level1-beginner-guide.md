@@ -11,8 +11,13 @@
 | Web Console | https://console-openshift-console.apps-crc.testing |
 | API Server | https://api.crc.testing:6443 |
 | 管理員帳號 | kubeadmin |
-| 管理員密碼 | AJELz-Mt3de-CEtmC-8Rkf6 |
+| 管理員密碼 | *依安裝結果而定* |
 | 一般使用者 | developer / developer |
+
+> **⚠️ 重要提醒：** `kubeadmin` 的密碼在每次 CRC 安裝時都會自動產生，每個環境的密碼都不同。請使用以下指令取得您環境的實際密碼：
+> ```bash
+> crc console --credentials
+> ```
 
 ---
 
@@ -24,8 +29,11 @@
 # 設定環境變數
 eval $(crc oc-env)
 
-# 以管理員身份登入
-oc login -u kubeadmin -p AJELz-Mt3de-CEtmC-8Rkf6 https://api.crc.testing:6443
+# 取得登入憑證
+crc console --credentials
+
+# 以管理員身份登入（請替換 <password> 為您的實際密碼）
+oc login -u kubeadmin -p <password> https://api.crc.testing:6443
 ```
 
 **預期輸出：**
